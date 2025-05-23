@@ -1,6 +1,9 @@
 const { AppDataSource } = require('../../config/data-source');
 
-async function createCategory(data) {
+const repository = AppDataSource.getRepository('Category');
+const userRepository = AppDataSource.getRepository('User');
+
+async function createCategories(data) {
   const { name, user } = data;
 
   if (!name) {
@@ -8,8 +11,6 @@ async function createCategory(data) {
   }
 
   try {
-    const repository = AppDataSource.getRepository('Category');
-    const userRepository = AppDataSource.getRepository('User');
     const userExists = await userRepository.findOne({
       where: { id: user },
     });
@@ -34,4 +35,84 @@ async function createCategory(data) {
   }
 }
 
-module.exports = { createCategory };
+async function getCategories(data) {
+  const { id, user } = data;
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+  try {
+    const userExists = await userRepository.findOne({
+      where: { id: user },
+    });
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+    const categories = await repository.find({
+      where: { user: { id: user } },
+    });
+
+    return categories;
+  } catch (error) {
+    throw new Error('Erro ao buscar categorias');
+  }
+}
+
+async function updateCategories(data) {
+  const { id, name, user } = data;
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+  try {
+    const userExists = await userRepository.findOne({
+      where: { id: user },
+    });
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+    const category = await repository.findOne({
+      where: { id, user: { id: user } },
+    });
+
+    if (!category) {
+      throw new Error('Categoria não encontrada');
+    }
+
+    category.name = name;
+
+    await repository.save(category);
+
+    return category;
+  } catch (error) {
+    throw new Error('Erro ao atualizar categoria');
+  }
+}
+
+async function deleteCategories(data) {
+  //deletar apenas usando o id da categoria
+  const { id } = data;
+  if (!id) {
+    throw new Error('ID da categoria é obrigatório');
+  }
+  try {
+    const category = await repository.findOne({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new Error('Categoria não encontrada');
+    }
+
+    await repository.remove(category);
+
+    return { message: 'Categoria deletada com sucesso' };
+  } catch (error) {
+    throw new Error('Erro ao deletar categoria');
+  }
+}
+
+module.exports = {
+  createCategories,
+  getCategories,
+  updateCategories,
+  deleteCategories,
+};
