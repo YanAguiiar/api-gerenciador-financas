@@ -10,7 +10,7 @@ async function login(req, res) {
   }
 
   try {
-    const result = await authenticateUser(email);
+    const result = await authenticateUser(email, password);
 
     if (!result) {
       return res.status(401).json({ message: 'Credenciais inválidas' });
