@@ -1,4 +1,8 @@
-const { authenticateUser, registerUser } = require('./auth-service');
+const {
+  authenticateUser,
+  registerUser,
+  createDefaultCategories,
+} = require('./auth-service');
 
 async function login(req, res) {
   const { email, password } = req.body;
@@ -39,6 +43,7 @@ async function register(req, res) {
 
   try {
     const result = await registerUser(name, email, password);
+    const defaults = await createDefaultCategories(result.user.id);
     if (!result) {
       return res.status(400).json({ message: 'Erro ao registrar usuário' });
     }

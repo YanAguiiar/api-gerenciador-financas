@@ -43,4 +43,36 @@ async function registerUser(name, email, password) {
   return { user };
 }
 
-module.exports = { authenticateUser, registerUser };
+// Função que ira criar categorias padrões ( Categoria (ex: Alimentação, Transporte, Salário,Outros)
+async function createDefaultCategories(userId) {
+  const categoryRepository = AppDataSource.getRepository('Category');
+  const userRepository = AppDataSource.getRepository('User');
+  const user = await userRepository.findOne({
+    where: { id: userId },
+  });
+  const defaultCategories = [
+    { name: 'Alimentação', userId },
+    { name: 'Transporte', userId },
+    { name: 'Salário', userId },
+    { name: 'Outros', userId },
+  ];
+
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  for (const category of defaultCategories) {
+    const existingCategory = await categoryRepository.findOne({
+      where: { name: category.name, user: { id: user.id } },
+      relations: ['user'],
+    });
+    if (!existingCategory) {
+      const newCategory = categoryRepository.create({
+        name: category.name,
+        user: user,
+      });
+      await categoryRepository.save(newCategory);
+    }
+  }
+}
+module.exports = { authenticateUser, registerUser, createDefaultCategories };
