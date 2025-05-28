@@ -1,0 +1,57 @@
+const { resumeTransactions } = require('../gemini/gemini-service');
+const { AppDataSource } = require('../../config/data-source');
+require('dotenv').config();
+
+const userRepository = AppDataSource.getRepository('User');
+const categoryRepository = AppDataSource.getRepository('Category');
+const transactionRepository = AppDataSource.getRepository('Transaction');
+
+async function getResume(data) {
+  const { user } = data;
+
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  try {
+    const userExists = await userRepository.findOne({
+      where: { id: user },
+    });
+
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    const transactions = await transactionRepository.find({
+      where: { user: { id: user } },
+      relations: ['category'],
+    });
+
+    if (transactions.length === 0) {
+      throw new Error('Nenhuma transação encontrada para o usuário');
+    }
+
+    const totalPorTipo = transactions.reduce((acc, item) => {
+      const value = Number(item.value);
+      acc[item.type] = (acc[item.type] || 0) + value;
+      return acc;
+    }, {});
+
+    const totalReceita = totalPorTipo.RECEITA || 0;
+    const totalDespesa = totalPorTipo.DESPESA || 0;
+    const saldoFinal = totalReceita - totalDespesa;
+
+    const resumoIA = await resumeTransactions({ transactions });
+
+    return {
+      totalReceita,
+      totalDespesa,
+      saldoFinal,
+      resumoIA,
+    };
+  } catch (error) {
+    throw new Error('Erro ao gerar resumo das transações');
+  }
+}
+
+module.exports = { getResume };

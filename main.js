@@ -4,6 +4,7 @@ const app = express();
 const authRoutes = require('./src/modules/auth/auth.routes');
 const categoryRoutes = require('./src/modules/category/category.routes');
 const transactionRoutes = require('./src/modules/transaction/transaction.routes');
+const reportRoutes = require('./src/modules/report/report.routes');
 const cors = require('cors');
 const authMiddleware = require('./src/modules/auth/auth-middleware');
 
@@ -33,6 +34,8 @@ async function main() {
   // Rota de Transações
   app.use('/api/transactions', authMiddleware, transactionRoutes);
 
+  // Rota de Relatórios
+  app.use('/api/report', reportRoutes);
   app.listen(3001, () => {
     console.log('Servidor rodando na porta 3001');
   });

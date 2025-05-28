@@ -43,7 +43,6 @@ async function registerUser(name, email, password) {
   return { user };
 }
 
-// Função que ira criar categorias padrões ( Categoria (ex: Alimentação, Transporte, Salário,Outros)
 async function createDefaultCategories(userId) {
   const categoryRepository = AppDataSource.getRepository('Category');
   const userRepository = AppDataSource.getRepository('User');
