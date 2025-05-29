@@ -15,7 +15,7 @@ async function authenticateUser(email, passwordClient) {
     throw new Error('Senha incorreta');
   }
 
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
+  const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
     expiresIn: '1h',
   });
 

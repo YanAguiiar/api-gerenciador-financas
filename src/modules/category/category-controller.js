@@ -8,13 +8,13 @@ const {
 async function newCategory(req, res) {
   console.log(req.body);
   const { name } = req.body;
-  // return res.status(200).json({ message: 'ok' });
+  const userId = req.user.id;
 
   if (!name) {
     return res.status(400).json({ message: 'Nome da categoria é obrigatório' });
   }
   try {
-    const result = await createCategories(req.body);
+    const result = await createCategories({ name, user: userId });
 
     return res.status(201).json({
       message: 'Categoria criada com sucesso!',
@@ -28,12 +28,8 @@ async function newCategory(req, res) {
 
 // Obter Categorias
 async function getCategory(req, res) {
-  const { user } = req.query;
-  if (!user) {
-    return res.status(400).json({ message: 'Usuário não encontrado' });
-  }
   try {
-    const categories = await getCategories(req.query);
+    const categories = await getCategories(req.user);
 
     return res.status(200).json({
       message: 'Categorias obtidas com sucesso!',
@@ -47,11 +43,16 @@ async function getCategory(req, res) {
 
 async function updateCategory(req, res) {
   const { id, name } = req.body;
+  const userId = req.user.id;
   if (!id || !name) {
     return res.status(400).json({ message: 'ID e nome são obrigatórios' });
   }
   try {
-    const result = await updateCategories(req.body);
+    const result = await updateCategories({
+      id,
+      name,
+      user: userId,
+    });
 
     return res.status(200).json({
       message: 'Categoria atualizada com sucesso!',
@@ -65,11 +66,15 @@ async function updateCategory(req, res) {
 
 async function deleteCategory(req, res) {
   const { id } = req.params;
+  const userId = req.user.id;
   if (!id) {
     return res.status(400).json({ message: 'ID é obrigatório' });
   }
   try {
-    const result = await deleteCategories(req.params);
+    const result = await deleteCategories({ id, userId });
+    if (!result) {
+      return res.status(404).json({ message: 'Categoria não encontrada' });
+    }
 
     return res.status(200).json({
       message: true,
@@ -77,7 +82,9 @@ async function deleteCategory(req, res) {
     });
   } catch (error) {
     console.error('Erro ao deletar categoria', error);
-    return res.status(500).json({ message: 'Erro interno do servidor' });
+    return res
+      .status(500)
+      .json({ message: error.message || 'Erro interno do servidor' });
   }
 }
 

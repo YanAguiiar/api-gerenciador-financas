@@ -36,19 +36,16 @@ async function createCategories(data) {
 }
 
 async function getCategories(data) {
-  const { id, user } = data;
-  if (!user) {
-    throw new Error('Usuário não encontrado');
-  }
+  const { id } = data;
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id },
     });
     if (!userExists) {
       throw new Error('Usuário não encontrado');
     }
     const categories = await repository.find({
-      where: { user: { id: user } },
+      where: { user: { id } },
     });
 
     return categories;
@@ -89,13 +86,14 @@ async function updateCategories(data) {
 
 async function deleteCategories(data) {
   //deletar apenas usando o id da categoria
-  const { id } = data;
+  const { id, userId } = data;
   if (!id) {
     throw new Error('ID da categoria é obrigatório');
   }
   try {
     const category = await repository.findOne({
-      where: { id },
+      where: { id, user: { id: userId } },
+      relations: ['user'],
     });
 
     if (!category) {

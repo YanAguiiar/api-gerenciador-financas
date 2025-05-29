@@ -35,7 +35,7 @@ async function main() {
   app.use('/api/transactions', authMiddleware, transactionRoutes);
 
   // Rota de Relatórios
-  app.use('/api/report', reportRoutes);
+  app.use('/api/report', authMiddleware, reportRoutes);
   app.listen(3001, () => {
     console.log('Servidor rodando na porta 3001');
   });

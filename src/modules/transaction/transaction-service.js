@@ -5,15 +5,15 @@ const userRepository = AppDataSource.getRepository('User');
 const categoryRepository = AppDataSource.getRepository('Category');
 
 async function createTransaction(data) {
-  const { title, value, type, date, user, category } = data;
+  const { title, value, type, date, userId, category } = data;
 
-  if (!title || !value || !type || !date || !user || !category) {
+  if (!title || !value || !type || !date || !userId || !category) {
     throw new Error('Todos os campos são obrigatórios');
   }
 
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id: userId },
     });
     if (!userExists) {
       throw new Error('Usuário não encontrado');
@@ -31,7 +31,7 @@ async function createTransaction(data) {
       value,
       type,
       date,
-      user: { id: user },
+      user: { id: userId },
       category: { id: category },
     });
     await repository.save(transaction);
@@ -49,19 +49,16 @@ async function createTransaction(data) {
 }
 
 async function getTransactions(data) {
-  const { user } = data;
-  if (!user) {
-    throw new Error('Usuário não encontrado');
-  }
+  const { userId } = data;
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id: userId },
     });
     if (!userExists) {
       throw new Error('Usuário não encontrado');
     }
     const transactions = await repository.find({
-      where: { user: { id: user } },
+      where: { user: { id: userId } },
       relations: ['category'],
     });
 
@@ -72,15 +69,10 @@ async function getTransactions(data) {
 }
 
 async function updateTransaction(data) {
-  const { id, title, value, type, date, user, category } = data;
-
-  if (!id || !title || !value || !type || !date || !user || !category) {
-    throw new Error('Todos os campos são obrigatórios');
-  }
-
+  const { id, title, value, type, date, userId, category } = data;
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id: userId },
     });
     if (!userExists) {
       throw new Error('Usuário não encontrado');
@@ -94,7 +86,7 @@ async function updateTransaction(data) {
     }
 
     const transaction = await repository.findOne({
-      where: { id, user: { id: user } },
+      where: { id, user: { id: userId } },
     });
 
     if (!transaction) {
@@ -119,20 +111,18 @@ async function updateTransaction(data) {
 }
 
 async function deleteTransaction(data) {
-  const { id, user } = data;
-  if (!id || !user) {
-    throw new Error('ID e usuário são obrigatórios');
-  }
+  const { id, userId } = data;
+
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id: userId },
     });
     if (!userExists) {
       throw new Error('Usuário não encontrado');
     }
 
     const transaction = await repository.findOne({
-      where: { id, user: { id: user } },
+      where: { id, user: { id: userId } },
     });
 
     if (!transaction) {
@@ -140,7 +130,6 @@ async function deleteTransaction(data) {
     }
     await repository.remove(transaction);
     return {
-      message: 'Transação deletada com sucesso',
       transaction,
     };
   } catch (error) {

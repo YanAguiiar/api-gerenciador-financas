@@ -1,14 +1,14 @@
 const { getResume } = require('./report-service');
 
 async function resumeTransactions(req, res) {
-  const { user } = req.query;
+  const userId = req.user.id;
 
-  if (!user) {
+  if (!userId) {
     return res.status(400).json({ message: 'Usuário não encontrado' });
   }
 
   try {
-    const resume = await getResume(req.query);
+    const resume = await getResume(userId);
 
     return res.status(200).json({
       message: 'Resumo das transações obtido com sucesso!',

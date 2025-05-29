@@ -7,6 +7,8 @@ async function resumeTransactions(data) {
       return `(${t.date}) ${t.type} de R$${t.value} em "${t.title}" [Categoria: ${t.category.name}]`;
     });
 
+    console.log(formattedTransactions);
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -20,9 +22,11 @@ async function resumeTransactions(data) {
               role: 'user',
               parts: [
                 {
-                  text: `Resuma as seguintes transações financeiras: ${formattedTransactions.join(
-                    ', '
-                  )} e forneça um resumo conciso e claro. Foque nos principais pontos, saldo RECEITA - DESPESA, como total gasto, categorias mais frequentes e qualquer padrão notável nas transações.`,
+                  text: `Analise as seguintes transações financeiras:
+
+${formattedTransactions.join(', ')}
+
+Forneça um resumo conciso destacando os principais padrões observados, como tipos de transações mais recorrentes, categorias mais frequentes, hábitos de consumo e qualquer comportamento financeiro notável. Mantenha uma linguagem clara e objetiva, como se estivesse gerando um relatório de análise de gastos.`,
                 },
               ],
             },

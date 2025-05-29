@@ -6,15 +6,23 @@ const {
 } = require('./transaction-service');
 
 async function newTransaction(req, res) {
-  const { title, value, type, date, user, category } = req.body;
+  const { title, value, type, date, category } = req.body;
+  const userId = req.user.id;
 
-  if (!title || !value || !type || !date || !user || !category) {
+  if (!title || !value || !type || !date || !userId || !category) {
     return res
       .status(400)
       .json({ message: 'Todos os campos são obrigatórios' });
   }
   try {
-    const result = await createTransaction(req.body);
+    const result = await createTransaction({
+      title,
+      value,
+      type,
+      date,
+      userId,
+      category,
+    });
 
     return res.status(201).json({
       message: 'Transação criada com sucesso',
@@ -28,12 +36,12 @@ async function newTransaction(req, res) {
 }
 
 async function getTransaction(req, res) {
-  const { user } = req.query;
-  if (!user) {
+  const userId = req.user.id;
+  if (!userId) {
     return res.status(400).json({ message: 'Usuário não encontrado' });
   }
   try {
-    const result = await getTransactions(req.query);
+    const result = await getTransactions(userId);
     return res.status(200).json({
       message: 'Transações obtidas com sucesso',
       transactions: result,
@@ -46,15 +54,24 @@ async function getTransaction(req, res) {
 }
 
 async function updateTransctions(req, res) {
-  const { id, title, value, type, date, user, category } = req.body;
+  const { id, title, value, type, date, category } = req.body;
+  const userId = req.user.id;
 
-  if (!id || !title || !value || !type || !date || !user || !category) {
+  if (!id || !title || !value || !type || !date || !userId || !category) {
     return res
       .status(400)
       .json({ message: 'Todos os campos são obrigatórios' });
   }
   try {
-    const result = await updateTransaction(req.body);
+    const result = await updateTransaction({
+      id,
+      title,
+      value,
+      type,
+      date,
+      userId,
+      category,
+    });
     return res.status(200).json({
       message: 'Transação atualizada com sucesso',
       transaction: result,
@@ -67,16 +84,17 @@ async function updateTransctions(req, res) {
 }
 
 async function deleteTransactions(req, res) {
-  const { id } = req.params;
+  const { id } = req.query;
+  const userId = req.user.id;
 
   if (!id) {
     return res.status(400).json({ message: 'ID da transação não encontrado' });
   }
   try {
-    const result = await deleteTransaction(id);
+    const result = await deleteTransaction(id, userId);
     return res.status(200).json({
       message: 'Transação deletada com sucesso',
-      transaction: result,
+      result,
     });
   } catch (error) {
     return res

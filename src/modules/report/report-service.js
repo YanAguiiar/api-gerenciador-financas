@@ -7,15 +7,11 @@ const categoryRepository = AppDataSource.getRepository('Category');
 const transactionRepository = AppDataSource.getRepository('Transaction');
 
 async function getResume(data) {
-  const { user } = data;
-
-  if (!user) {
-    throw new Error('Usuário não encontrado');
-  }
+  const { userId } = data;
 
   try {
     const userExists = await userRepository.findOne({
-      where: { id: user },
+      where: { id: userId },
     });
 
     if (!userExists) {
@@ -23,7 +19,7 @@ async function getResume(data) {
     }
 
     const transactions = await transactionRepository.find({
-      where: { user: { id: user } },
+      where: { user: { id: userId } },
       relations: ['category'],
     });
 
@@ -39,7 +35,7 @@ async function getResume(data) {
 
     const totalReceita = totalPorTipo.RECEITA || 0;
     const totalDespesa = totalPorTipo.DESPESA || 0;
-    const saldoFinal = totalReceita - totalDespesa;
+    const saldoFinal = Number((totalReceita - totalDespesa).toFixed(2));
 
     const resumoIA = await resumeTransactions({ transactions });
 
