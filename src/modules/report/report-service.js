@@ -37,17 +37,43 @@ async function getResume(data) {
     const totalDespesa = totalPorTipo.DESPESA || 0;
     const saldoFinal = Number((totalReceita - totalDespesa).toFixed(2));
 
-    const resumoIA = await resumeTransactions({ transactions });
-
     return {
       totalReceita,
       totalDespesa,
       saldoFinal,
-      resumoIA,
     };
   } catch (error) {
     throw new Error('Erro ao gerar resumo das transações');
   }
 }
 
-module.exports = { getResume };
+async function getResumeIA(data) {
+  const { userId } = data;
+
+  try {
+    const userExists = await userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    const transactions = await transactionRepository.find({
+      where: { user: { id: userId } },
+      relations: ['category'],
+    });
+
+    if (transactions.length === 0) {
+      throw new Error('Nenhuma transação encontrada para o usuário');
+    }
+
+    const resumoIA = await resumeTransactions({ transactions });
+
+    return resumoIA;
+  } catch (error) {
+    throw new Error('Erro ao gerar resumo das transações com IA');
+  }
+}
+
+module.exports = { getResume, getResumeIA };

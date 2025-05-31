@@ -42,10 +42,7 @@ async function getTransaction(req, res) {
   }
   try {
     const result = await getTransactions(userId);
-    return res.status(200).json({
-      message: 'Transações obtidas com sucesso',
-      transactions: result,
-    });
+    return res.status(200).json(result);
   } catch (error) {
     return res
       .status(500)

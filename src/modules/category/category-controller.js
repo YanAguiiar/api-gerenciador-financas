@@ -31,10 +31,7 @@ async function getCategory(req, res) {
   try {
     const categories = await getCategories(req.user);
 
-    return res.status(200).json({
-      message: 'Categorias obtidas com sucesso!',
-      categories,
-    });
+    return res.status(200).json(categories);
   } catch (error) {
     console.error('Erro ao obter categorias', error);
     return res.status(500).json({ message: 'Erro interno do servidor' });

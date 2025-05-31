@@ -26,7 +26,13 @@ async function resumeTransactions(data) {
 
 ${formattedTransactions.join(', ')}
 
-Forneça um resumo conciso destacando os principais padrões observados, como tipos de transações mais recorrentes, categorias mais frequentes, hábitos de consumo e qualquer comportamento financeiro notável. Mantenha uma linguagem clara e objetiva, como se estivesse gerando um relatório de análise de gastos.`,
+Forneça um resumo conciso destacando os principais padrões observados: tipos de transações mais recorrentes, categorias mais frequentes, hábitos de consumo e qualquer comportamento financeiro notável.
+
+**Importante:**  
+- Traga o resultado **exclusivamente em elementos HTML** (H1, H2, H3 e p etc).  
+- **Não repita o título fora das tags HTML.**  
+- Evite qualquer caractere ou texto fora da estrutura HTML.  
+`,
                 },
               ],
             },
