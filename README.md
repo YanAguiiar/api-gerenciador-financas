@@ -30,7 +30,7 @@ API REST para gerenciamento de finanças pessoais, desenvolvida com Node.js, Exp
 
 1. Clone o repositório
 ```bash
-git clone [url-do-repositorio]
+git clone https://github.com/YanAguiiar/api-gerenciador-financas
 ```
 
 2. Instale as dependências
